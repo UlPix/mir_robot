@@ -117,7 +117,7 @@ def generate_launch_description():
         return [SetLaunchConfiguration('robot_name', robot_name)]
 
     mir_robot_xacro_path = os.path.join(
-        get_package_share_directory('mir_description'), 'urdf', 'mir.urdf.xacro')
+        get_package_share_directory('mir_description'), 'urdf', 'mir.urdf')
 
     spawn_robot = Node(
         package='ros_gz_sim',

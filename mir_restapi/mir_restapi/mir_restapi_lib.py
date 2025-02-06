@@ -49,7 +49,7 @@ class HttpConnection():
 
     def put(self, path, body):
         self.connection.request(
-            "PUT", self.api_prefix+path, body=body, headers=self.http_headers)
+            "PUT", self.api_prefix + path, body=body, headers=self.http_headers)
         resp = self.connection.getresponse()
         # self.logger.info(resp.read())
         if resp.status < 200 or resp.status >= 300:
@@ -213,6 +213,7 @@ class MirRestAPI():
 
     def get_mission_details(self, mission_id):
         response = self.http.get(f"/missions/{mission_id}")
+        print(response.read().decode())
         return json.loads(response.read())
 
     def get_mission_guid_by_name(self, mission_name):
@@ -244,18 +245,14 @@ class MirRestAPI():
 
     def edit_move_action_in_mission(self, mission_guid, action_guid, payload):
         put_response = self.http.put(
-            f"/missions/{mission_guid}/actions/{action_guid}", body=payload)
+            f"/missions/{mission_guid}/actions/{action_guid}", body=json.dumps(payload))
 
-        if put_response.status_code == 200:
-            self.logger.info(f"Action updated successfully")
-            return 1
-        self.logger.info(
-            f"Failed to update action. Status code: {put_response.status_code}")
-        return 0
+        # dont have to check for status since since put method already handles that
+        self.logger.info(f"Action updated successfully")
 
     def move_to(self, position, mission="move_to"):
-        mis_guid = self.get_mission_guid(mission)
-        pos_guid = self.get_pose_guid(position)
+        mis_guid = self.get_mission_guid_by_name(mission)
+        pos_guid = self.get_pose_guid_by_name(position)
 
         for (var, txt, name) in zip((mis_guid, pos_guid), ("Mission", "Position"),
                                     (mission, position)):
@@ -290,17 +287,24 @@ class MirRestAPI():
     def move_to_x_y_theta(self, x: float, y: float, orientation: float, mission: str = "move_to_xy", delete_queue: bool = True,
                           retries: int = 10, distance_threshold: float = 0.1, is_blocking: bool = True):
         # pause robot
-        self.set_state_id(4)
-        if delete_queue:
-            self.delete_mission_queue()
+        # if delete_queue:
+        #    print(self.delete_mission_queue())
+        # self.set_state_id(4)
+
         # set robot ready
         self.set_state_id(3)
 
         mission_guid = self.get_mission_guid_by_name(mission)
+
+        print("MISSION_GUID", mission_guid)
+
         # This assumes that the mission has only one action that was created by the user beforehand
         action_guids = self.get_actions_for_mission(mission_guid)[0]
+
+        print(action_guids)
+        # input()
         self.edit_move_action_in_mission(mission_guid=mission_guid, action_guid=action_guids,
-                                         payload=json.dumps({
+                                         payload={
                                              "priority": 1,
                                              "parameters": [
                                                  {"value": x, "id": "x"},
@@ -314,9 +318,9 @@ class MirRestAPI():
                                                      "id": "distance_threshold"}
                                              ]
 
-                                         }))
+                                         })
         self.add_mission_to_queue(mission)
-        self.logger.info("Mission added to queue, navigating to x: {}, y: {}, theta: {}".format()
+        self.logger.info(f"Mission added to queue, navigating to x: {x}, y: {y}, theta: {orientation}"
                          )
 
         if is_blocking:
@@ -339,18 +343,19 @@ class MirRestAPI():
         return self.http.post("/positions", body)
 
     def get_actions_for_mission(self, mission_id) -> list:
-        action_url = self.get_mission_details(mission_id)['actions']
-        actions_response = self.http.get(f"/{action_url}")
-
-        if actions_response.status_code == 200:
-            actions = actions_response.json()
+        actions_response = self.http.get(f"/missions/{mission_id}/actions")
+        resp_enc = json.loads(actions_response.read())
+        if actions_response.status == 200:
+            assert len(
+                resp_enc) > 0, "More than 1 action found, might cause confusion"
+            actions = resp_enc
             for action in actions:
                 self.logger.info(
                     f"Action GUID: {action['guid']}, Action Type: {action['action_type']}")
 
             return [action['guid'] for action in actions]
         raise Exception(
-            f"Failed to retrieve actions. Status code: {actions_response.status_code}")
+            f"Failed to retrieve actions. Status code: {actions_response.status}")
 
     def delete_position(self, position_guid):
         return self.http.delete(f"/positions/{position_guid}")
@@ -402,7 +407,6 @@ class MirRestAPI():
         # self.logger.info("Mission with queue_id {} is in queue".format(mission_queue_id))
         # self.logger.info("Response status {}".format(response.status))
         data = json.loads(response.read())
-
         for d in data:
             if d["id"] == mission_queue_id:
                 if d["state"] == 'Done':
@@ -426,7 +430,9 @@ if __name__ == "__main__":
     # print(auth_token)
     api_handle = MirRestAPI(hostname="192.168.12.20",
                             logger=Logger("test"), auth=auth_token)
-    # all_maps = api_handle.get_all_map_info()
+    x_home = 13.700
+    y_home = 39.850
+    orientation_home = -100
 
     # map_guid = api_handle.get_map_guid_by_name("Versuchsfeld")
     # api_handle.add_position(name="test_pose_1", x=2,
@@ -436,4 +442,9 @@ if __name__ == "__main__":
     #     test_guid)
     # print(api_handle.get_paths(
     #    start_pos="/v2.0.0/positions/50066f07-4b51-11ef-b5ca-a41cb401473e", goal_pos="/v2.0.0/positions/0a59fe81-4e77-11ef-8af2-a41cb401473e"))
-    api_handle.move_to("home")
+
+    # throws http.client.ResponseNotReady: Request-sent ?! might rewrite entire lib using request lib
+    # api_handle.delete_mission_queue()
+
+    api_handle.move_to_x_y_theta(
+        x=x_home, y=y_home, orientation=orientation_home)

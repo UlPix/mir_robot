@@ -24,7 +24,7 @@ RUN git checkout port_gazebo
 RUN vcs import < ./ros2.repos --recursive
 RUN sudo apt update && rosdep update --rosdistro=humble
 RUN rosdep install --from-paths . --ignore-src -r -y --rosdistro humble
-RUN source /opt/ros/humble/setup.bash
-RUN colcon build --packages-up-to mir_gazebo && source install/setup.bash
+WORKDIR /ws/mir_robot
+RUN /bin/bash -c "source /opt/ros/humble/setup.bash; colcon build --packages-up-to mir_gazebo"
 
-CMD ["bash"]
+

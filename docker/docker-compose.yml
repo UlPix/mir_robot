@@ -5,6 +5,7 @@ services:
     environment:
       - DISPLAY=${DISPLAY}
       - XAUTHORITY=/tmp/.Xauthority
+      - GZ_VERSION="fortress"
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - ~/mir_robot:/ws/mir_robot

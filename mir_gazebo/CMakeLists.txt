@@ -23,7 +23,7 @@ find_package(ros_gz REQUIRED)
 find_package(ira_laser_tools REQUIRED)
 
 install(DIRECTORY
-  launch worlds maps rviz
+  launch worlds maps rviz config
   DESTINATION share/${PROJECT_NAME}
 )
 

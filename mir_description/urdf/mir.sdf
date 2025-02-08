@@ -109,42 +109,13 @@
           </script>
         </material>
       </visual>
-      <sensor name='back_laser_link' type='ray'>
+      <sensor name='back_laser_link' type='gpu_lidar'>
         <visualize>0</visualize>
         <update_rate>12.5</update_rate>
-        <ray>
-          <scan>
-            <horizontal>
-              <samples>541</samples>
-              <resolution>1</resolution>
-              <min_angle>-2.35619</min_angle>
-              <max_angle>2.35619</max_angle>
-            </horizontal>
-          </scan>
-          <range>
-            <min>0.05</min>
-            <max>29</max>
-            <resolution>0.01</resolution>
-          </range>
-          <noise>
-            <type>gaussian</type>
-            <mean>0</mean>
-            <stddev>0.01</stddev>
-          </noise>
-        </ray>
-        <plugin name='gazebo_ros_back_laser_link_controller' filename='libgazebo_ros_ray_sensor.so'>
-          <ros>
-            <remapping>~/out:=b_scan</remapping>
-          </ros>
-          <output_type>sensor_msgs/LaserScan</output_type>
-          <frame_name>back_laser_link</frame_name>
-        </plugin>
+        <topic>b_scan</topic>
+        <gz_frame_id>back_laser_link</gz_frame_id>
         <pose>-0.3548 -0.2352 0.1914 0 0 -2.35619</pose>
-      </sensor>
-      <sensor name='front_laser_link' type='ray'>
-        <visualize>0</visualize>
-        <update_rate>12.5</update_rate>
-        <ray>
+        <lidar>
           <scan>
             <horizontal>
               <samples>541</samples>
@@ -163,21 +134,41 @@
             <mean>0</mean>
             <stddev>0.01</stddev>
           </noise>
-        </ray>
-        <plugin name='gazebo_ros_front_laser_link_controller' filename='libgazebo_ros_ray_sensor.so'>
-          <ros>
-            <remapping>~/out:=f_scan</remapping>
-          </ros>
-          <output_type>sensor_msgs/LaserScan</output_type>
-          <frame_name>front_laser_link</frame_name>
-        </plugin>
+        </lidar>
+      </sensor>
+      <sensor name='front_laser_link' type='gpu_lidar'>
+        <visualize>0</visualize>
+        <update_rate>12.5</update_rate>
+        <topic>f_scan</topic>
+        <gz_frame_id>front_laser_link</gz_frame_id>
         <pose>0.4288 0.2358 0.1914 0 -0 0.785398</pose>
+        <lidar>
+          <scan>
+            <horizontal>
+              <samples>541</samples>
+              <resolution>1</resolution>
+              <min_angle>-2.35619</min_angle>
+              <max_angle>2.35619</max_angle>
+            </horizontal>
+          </scan>
+          <range>
+            <min>0.05</min>
+            <max>29</max>
+            <resolution>0.01</resolution>
+          </range>
+          <noise>
+            <type>gaussian</type>
+            <mean>0</mean>
+            <stddev>0.01</stddev>
+          </noise>
+        </lidar>
       </sensor>
       <gravity>1</gravity>
       <sensor name='imu_sensor' type='imu'>
         <always_on>1</always_on>
         <update_rate>50</update_rate>
         <visualize>1</visualize>
+        <topic>data</topic>
         <imu>
           <angular_velocity>
             <x>
@@ -232,14 +223,6 @@
             </z>
           </linear_acceleration>
         </imu>
-        <plugin name='imu_plugin' filename='libgazebo_ros_imu_sensor.so'>
-          <initial_orientation_as_reference>0</initial_orientation_as_reference>
-          <ros>
-            <namespace>imu_data</namespace>
-            <remapping>~/out:=data</remapping>
-            <frame_name>imu_frame</frame_name>
-          </ros>
-        </plugin>
         <pose>0 0 0.25 0 -0 0</pose>
       </sensor>
     </link>
@@ -798,7 +781,7 @@
       <axis>
         <xyz>0 1 0</xyz>
         <limit>
-          <effort>100</effort>
+          <effort>10</effort> <!-- from <wheel_torque> in libgazebo_ros_diff_drive.so.-->
           <velocity>20</velocity>
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
@@ -874,7 +857,7 @@
       <axis>
         <xyz>0 1 0</xyz>
         <limit>
-          <effort>100</effort>
+          <effort>10</effort> <!-- from <wheel_torque> in libgazebo_ros_diff_drive.so.-->
           <velocity>20</velocity>
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
@@ -943,63 +926,25 @@
         </material>
       </visual>
     </link>
-    <plugin name='fl_caster_rotation_joint_states' filename='libgazebo_ros_joint_state_publisher.so'>
-      <ros>
-        <namespace/>
-      </ros>
-      <update_rate>200.0</update_rate>
+
+    <plugin filename="gz-sim-joint-state-publisher-system"
+      name="gz::sim::systems::JointStatePublisher">
+      <topic>joint_states</topic> <!--from <ros><remapping> -->
+      <joint_name>right_wheel_joint</joint_name>
+      <joint_name>left_wheel_joint</joint_name>
       <joint_name>fl_caster_rotation_joint</joint_name>
-    </plugin>
-    <plugin name='fl_caster_wheel_joint_states' filename='libgazebo_ros_joint_state_publisher.so'>
-      <ros>
-        <namespace/>
-      </ros>
-      <update_rate>200.0</update_rate>
       <joint_name>fl_caster_wheel_joint</joint_name>
-    </plugin>
-    <plugin name='fr_caster_rotation_joint_states' filename='libgazebo_ros_joint_state_publisher.so'>
-      <ros>
-        <namespace/>
-      </ros>
-      <update_rate>200.0</update_rate>
       <joint_name>fr_caster_rotation_joint</joint_name>
-    </plugin>
-    <plugin name='fr_caster_wheel_joint_states' filename='libgazebo_ros_joint_state_publisher.so'>
-      <ros>
-        <namespace/>
-      </ros>
-      <update_rate>200.0</update_rate>
       <joint_name>fr_caster_wheel_joint</joint_name>
-    </plugin>
-    <plugin name='bl_caster_rotation_joint_states' filename='libgazebo_ros_joint_state_publisher.so'>
-      <ros>
-        <namespace/>
-      </ros>
-      <update_rate>200.0</update_rate>
+
       <joint_name>bl_caster_rotation_joint</joint_name>
-    </plugin>
-    <plugin name='bl_caster_wheel_joint_states' filename='libgazebo_ros_joint_state_publisher.so'>
-      <ros>
-        <namespace/>
-      </ros>
-      <update_rate>200.0</update_rate>
       <joint_name>bl_caster_wheel_joint</joint_name>
-    </plugin>
-    <plugin name='br_caster_rotation_joint_states' filename='libgazebo_ros_joint_state_publisher.so'>
-      <ros>
-        <namespace/>
-      </ros>
-      <update_rate>200.0</update_rate>
       <joint_name>br_caster_rotation_joint</joint_name>
-    </plugin>
-    <plugin name='br_caster_wheel_joint_states' filename='libgazebo_ros_joint_state_publisher.so'>
-      <ros>
-        <namespace/>
-      </ros>
-      <update_rate>200.0</update_rate>
       <joint_name>br_caster_wheel_joint</joint_name>
     </plugin>
-    <plugin name='p3d_base_controller' filename='libgazebo_ros_p3d.so'>
+
+   
+    <!--plugin name='p3d_base_controller' filename='libgazebo_ros_p3d.so'>
       <ros>
         <remapping>odom:=base_pose_ground_truth</remapping>
       </ros>
@@ -1010,35 +955,30 @@
       <frame_name>map</frame_name>
       <xyz_offset>0 0 0</xyz_offset>
       <rpy_offset>0 0 0</rpy_offset>
-    </plugin>
+    </plugin> -->
     <static>0</static>
-    <plugin name='joint_states' filename='libgazebo_ros_joint_state_publisher.so'>
-      <ros>
-        <namespace/>
-      </ros>
-      <update_rate>1000.0</update_rate>
-      <joint_name>right_wheel_joint</joint_name>
-      <joint_name>left_wheel_joint</joint_name>
-    </plugin>
-    <plugin name='diff_drive_controller' filename='libgazebo_ros_diff_drive.so'>
-      <ros>
-        <remapping>cmd_vel:=cmd_vel</remapping>
-        <remapping>odom:=odom</remapping>
-      </ros>
-      <legacy_mode>0</legacy_mode>
-      <always_on>1</always_on>
-      <update_rate>1000.0</update_rate>
-      <left_joint>left_wheel_joint</left_joint>
-      <right_joint>right_wheel_joint</right_joint>
-      <wheel_separation>0.445208</wheel_separation>
-      <wheel_diameter>0.125</wheel_diameter>
-      <odometry_frame>odom</odometry_frame>
-      <robot_base_frame>base_footprint</robot_base_frame>
-      <publish_odom>1</publish_odom>
-      <publish_wheel_tf>0</publish_wheel_tf>
-      <publish_odom_tf>1</publish_odom_tf>
+    <plugin name='gz::sim::systems::DiffDrive' filename='gz-sim-diff-drive-system'>
+
+        <!-- wheels -->
+        <left_joint>left_wheel_joint</left_joint>
+        <right_joint>right_wheel_joint</right_joint>
+
+        <!-- kinematics -->
+        <wheel_separation>0.445208</wheel_separation>
+        <wheel_radius>0.0625</wheel_radius> <!-- computed from <wheel_diameter> in the original plugin-->
+
+        <!-- limits -->
+        <max_linear_acceleration>0.175</max_linear_acceleration> <!-- computed from <max_linear_acceleration> (old plugin; value was 2.8) * wheel_radius -->
+
+        <topic>cmd_vel</topic> <!-- from <commant_topic> -->
+
+        <odom_topic>odom</odom_topic> <!-- from <odometry_topic> -->
+        <frame_id>odom</frame_id> <!-- from <odometry_frame> -->
+        <child_frame_id>base_footprint</child_frame_id>
+        <odom_publisher_frequency>1000.0</odom_publisher_frequency>
+        <tf_topic>/tf</tf_topic> <!-- Short topic name for tf output -->
+
       <max_wheel_torque>10</max_wheel_torque>
-      <max_wheel_acceleration>2.8</max_wheel_acceleration>
     </plugin>
   </model>
 </sdf>

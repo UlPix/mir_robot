@@ -18,6 +18,13 @@ def generate_launch_description():
     ros_gz_sim = get_package_share_directory('ros_gz_sim')
 
     rviz_config_file = LaunchConfiguration('rviz_config_file')
+    mir_robot_xacro_path = os.path.join(
+        get_package_share_directory('mir_description'), 'urdf', 'mir.sdf')
+    bridge_params = os.path.join(
+        get_package_share_directory('mir_gazebo'),
+        'config',
+        'mir_bridge.yaml'
+        )
 
     ld = LaunchDescription()
 
@@ -116,8 +123,7 @@ def generate_launch_description():
             pass
         return [SetLaunchConfiguration('robot_name', robot_name)]
 
-    mir_robot_xacro_path = os.path.join(
-        get_package_share_directory('mir_description'), 'urdf', 'mir.urdf')
+   
 
     spawn_robot = Node(
         package='ros_gz_sim',
@@ -131,6 +137,17 @@ def generate_launch_description():
         ],
         output='screen',
     )
+    start_gazebo_ros_bridge_cmd = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        arguments=[
+            '--ros-args',
+            '-p',
+            f'config_file:={bridge_params}',
+        ],
+        output='screen',
+    )
+
     gzserver_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(ros_gz_sim, 'launch', 'gz_sim.launch.py')

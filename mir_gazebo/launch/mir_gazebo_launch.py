@@ -19,7 +19,7 @@ def generate_launch_description():
 
     rviz_config_file = LaunchConfiguration('rviz_config_file')
     mir_robot_xacro_path = os.path.join(
-        get_package_share_directory('mir_description'), 'urdf', 'mir.sdf')
+        get_package_share_directory('mir_description'), 'urdf', 'mir.urdf')
     bridge_params = os.path.join(
         get_package_share_directory('mir_gazebo'),
         'config',
@@ -60,7 +60,7 @@ def generate_launch_description():
 
     declare_verbose_arg = DeclareLaunchArgument(
         'verbose',
-        default_value='false',
+        default_value='true',
         description='Set to true to enable verbose mode for Gazebo.')
 
     declare_teleop_arg = DeclareLaunchArgument(
@@ -199,5 +199,7 @@ def generate_launch_description():
     ld.add_action(spawn_robot)
     ld.add_action(launch_rviz)
     ld.add_action(launch_teleop)
+    ld.add_action(start_gazebo_ros_bridge_cmd)
+
 
     return ld

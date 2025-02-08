@@ -27,7 +27,7 @@ def generate_launch_description():
                          'max_completion_time': 0.05,
                          'max_merge_time_diff': 0.005,
                          'use_sim_time': LaunchConfiguration('use_sim_time'),
-                         'best_effort': True}],
+                         'best_effort': False}],
             namespace=namespace,    # adds namespace to topic names and frames
             output='screen')
     ])

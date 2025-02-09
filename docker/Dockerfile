@@ -16,7 +16,7 @@ RUN apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /ws
 RUN mkdir -p /ws/mir_robot
-RUN git clone https://github.com/UlPix/mir_robot.git
+#RUN git clone https://github.com/UlPix/mir_robot.git
 WORKDIR /ws/mir_robot
 RUN git config --global --add safe.directory /ws/mir_robot
 RUN git checkout port_gazebo

@@ -55,8 +55,10 @@ def generate_launch_description():
 
     declare_world_arg = DeclareLaunchArgument(
         'world',
-        default_value='empty',
-        description='Choose simulation world. Available worlds: empty, maze')
+        default_value=os.path.join(
+            get_package_share_directory('mir_gazebo'),
+            'worlds', 'empty.world'),
+        description='Define world thats being used.')
 
     declare_verbose_arg = DeclareLaunchArgument(
         'verbose',
@@ -78,13 +80,6 @@ def generate_launch_description():
         default_value=os.path.join(
             mir_description_dir, 'rviz', 'mir_visu_full.rviz'),
         description='Define rviz config file to be used.')
-
-    declare_world_arg = DeclareLaunchArgument(
-        'world',
-        default_value=os.path.join(
-            get_package_share_directory('mir_gazebo'),
-            'worlds', 'empty.world'),
-        description='Define world thats being used.')
 
     declare_gui_arg = DeclareLaunchArgument(
         'gui',
@@ -191,7 +186,6 @@ def generate_launch_description():
     ld.add_action(declare_rviz_arg)
     ld.add_action(declare_rviz_config_arg)
     ld.add_action(declare_gui_arg)
-
     ld.add_action(gzserver_cmd)
     ld.add_action(gzclient_cmd)
     ld.add_action(launch_mir_description)

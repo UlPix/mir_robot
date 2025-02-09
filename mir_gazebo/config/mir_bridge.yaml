@@ -55,14 +55,17 @@
   direction: GZ_TO_ROS
 
 # publish merged scan to ro gazebo
-- ros_topic_name: "scan"
-  gz_topic_name: "scan"
+## does not work due to incompatible qos
+# since ros jazzy, bridge is launchable and accepts qos mapping
+# ros2 launch ros_gz_bridge ros_gz_bridge.launch.py \
+#   bridge_name:=ros_gz_bridge \
+#   bridge_params:="'qos_overrides./scan.publisher.reliability': 'reliable', 'qos_overrides./scan.publisher.durability': 'transient_local'"
+
+- ros_topic_name: "scan_gaz"
+  gz_topic_name: "scan_gaz"
   ros_type_name: "sensor_msgs/msg/LaserScan"
   gz_type_name: "gz.msgs.LaserScan"
-  direction: GZ_TO_ROS
-  
-
-
+  direction: ROS_TO_GZ
 
 # gz topic published by Sensors plugin (Camera)
 - ros_topic_name: "camera/camera_info"

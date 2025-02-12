@@ -4,7 +4,7 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.conditions import IfCondition
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, OpaqueFunction, \
-    SetLaunchConfiguration
+    SetLaunchConfiguration, AppendEnvironmentVariable
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
@@ -24,7 +24,7 @@ def generate_launch_description():
         get_package_share_directory('mir_gazebo'),
         'config',
         'mir_bridge.yaml'
-        )
+    )
 
     ld = LaunchDescription()
 
@@ -118,8 +118,6 @@ def generate_launch_description():
             pass
         return [SetLaunchConfiguration('robot_name', robot_name)]
 
-   
-
     spawn_robot = Node(
         package='ros_gz_sim',
         executable='create',
@@ -156,6 +154,10 @@ def generate_launch_description():
         ),
         launch_arguments={'gz_args': '-g -v4 '}.items()
     )
+    set_env_vars_resources = AppendEnvironmentVariable(
+        'GZ_SIM_RESOURCE_PATH',
+        os.path.join(mir_description_dir, 'urdf'),
+    )
 
     launch_rviz = Node(
         condition=IfCondition(LaunchConfiguration('rviz_enabled')),
@@ -190,10 +192,10 @@ def generate_launch_description():
     ld.add_action(gzclient_cmd)
     ld.add_action(launch_mir_description)
     ld.add_action(launch_mir_gazebo_common)
+    ld.add_action(set_env_vars_resources)
     ld.add_action(spawn_robot)
     ld.add_action(launch_rviz)
     ld.add_action(launch_teleop)
     ld.add_action(start_gazebo_ros_bridge_cmd)
-
 
     return ld

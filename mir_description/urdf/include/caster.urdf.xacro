@@ -15,6 +15,7 @@
     <gazebo>
       <plugin filename="gz-sim-joint-state-publisher-system" name="gz::sim::systems::JointStatePublisher">
         <namespace>${ns}</namespace>
+        <topic>joint_states</topic>
         <joint_name>${prefix}${locationprefix}_caster_rotation_joint</joint_name>
       </plugin>
     </gazebo>
@@ -61,6 +62,7 @@
     <gazebo>
       <plugin filename="gz-sim-joint-state-publisher-system" name="gz::sim::systems::JointStatePublisher">
         <namespace>${ns}</namespace>
+        <topic>joint_states</topic>
         <joint_name>${prefix}${locationprefix}_caster_wheel_joint</joint_name>
       </plugin>
     </gazebo>

@@ -19,7 +19,7 @@ def generate_launch_description():
 
     rviz_config_file = LaunchConfiguration('rviz_config_file')
     mir_robot_xacro_path = os.path.join(
-        get_package_share_directory('mir_description'), 'urdf', 'mir.sdf')
+        get_package_share_directory('mir_description'), 'urdf', 'mir_ported.urdf')
     bridge_params = os.path.join(
         get_package_share_directory('mir_gazebo'),
         'config',

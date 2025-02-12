@@ -29,7 +29,7 @@
   </xacro:macro>
 
  <!-- See https://github.com/ros-simulation/gazebo_ros_pkgs/wiki/ROS-2-Migration:-P3D for ros2 information -->
-  <xacro:macro name="p3d_base_controller" params="prefix">
+  <!-- <xacro:macro name="p3d_base_controller" params="prefix">
     <gazebo>
       <plugin name="p3d_base_controller" filename="libgazebo_ros_p3d.so">
         <ros>
@@ -44,5 +44,5 @@
         <rpy_offset>0 0 0</rpy_offset>
       </plugin>
     </gazebo>
-  </xacro:macro>
+  </xacro:macro> -->
 </robot>

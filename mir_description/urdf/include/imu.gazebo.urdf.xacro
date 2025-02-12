@@ -18,6 +18,8 @@
         <always_on>true</always_on>
         <update_rate>${update_rate}</update_rate>
         <visualize>true</visualize>
+        <frame_id>${imu_frame}</frame_id> 
+        <topic>${imu_topic}</topic>
         <imu>
           <angular_velocity>
             <x>
@@ -72,14 +74,6 @@
             </z>
           </linear_acceleration>
         </imu>
-        <plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
-        <initial_orientation_as_reference>false</initial_orientation_as_reference>
-          <ros>
-            <namespace>${imu_topic}</namespace>
-            <remapping>~/out:=data</remapping>
-            <frame_name>${imu_frame}</frame_name>  <!-- from real MiR -->
-          </ros>
-        </plugin>
       </sensor>
     </gazebo>
   </xacro:macro>

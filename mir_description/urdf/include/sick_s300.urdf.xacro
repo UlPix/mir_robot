@@ -35,7 +35,7 @@
       <sensor type="gpu_lidar" name="${prefix}${link}">
         <visualize>false</visualize>
         <update_rate>12.5</update_rate>
-        <frame_id>${prefix}${link}</frame_id>
+        <gz_frame_id>${prefix}${link}</gz_frame_id>
         <topic>${prefix}${topic}</topic>
         <lidar>
           <scan>

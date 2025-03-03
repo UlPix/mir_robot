@@ -65,6 +65,7 @@ set(msg_files
   # "msg/WorldMap.msg"
   # "msg/WorldModel.msg"
   "srv/ExecMission.srv"
+  "srv/MoveToXYTheta.srv"
 )
 
 rosidl_generate_interfaces(${PROJECT_NAME}

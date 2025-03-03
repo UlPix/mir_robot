@@ -285,49 +285,56 @@ class MirRestAPI():
         self.logger.info("Mission executed successfully")
 
     def move_to_x_y_theta(self, x: float, y: float, orientation: float, mission: str = "move_to_xy", delete_queue: bool = True,
-                          retries: int = 10, distance_threshold: float = 0.1, is_blocking: bool = True):
+                          retries: int = 10, distance_threshold: float = 0.1, is_blocking: bool = True) -> bool:
         # pause robot
         # if delete_queue:
         #    print(self.delete_mission_queue())
         # self.set_state_id(4)
+        success = True
+        try:
 
-        # set robot ready
-        self.set_state_id(3)
+            # set robot ready
+            self.set_state_id(3)
 
-        mission_guid = self.get_mission_guid_by_name(mission)
+            mission_guid = self.get_mission_guid_by_name(mission)
 
-        print("MISSION_GUID", mission_guid)
+            print("MISSION_GUID", mission_guid)
 
-        # This assumes that the mission has only one action that was created by the user beforehand
-        action_guids = self.get_actions_for_mission(mission_guid)[0]
+            # This assumes that the mission has only one action that was created by the user beforehand
+            action_guids = self.get_actions_for_mission(mission_guid)[0]
 
-        print(action_guids)
-        # input()
-        self.edit_move_action_in_mission(mission_guid=mission_guid, action_guid=action_guids,
-                                         payload={
-                                             "priority": 1,
-                                             "parameters": [
-                                                 {"value": x, "id": "x"},
-                                                 {"value": y, "id": "y"},
-                                                 {"value": 0, "id": "z"},
-                                                 {"value": orientation,
-                                                     "id": "orientation"},
-                                                 {"value": retries,
-                                                     "id": "retries"},
-                                                 {"value": distance_threshold,
-                                                     "id": "distance_threshold"}
-                                             ]
+            print(action_guids)
+            # input()
+            self.edit_move_action_in_mission(mission_guid=mission_guid, action_guid=action_guids,
+                                             payload={
+                                                 "priority": 1,
+                                                 "parameters": [
+                                                     {"value": x, "id": "x"},
+                                                     {"value": y, "id": "y"},
+                                                     {"value": 0, "id": "z"},
+                                                     {"value": orientation,
+                                                      "id": "orientation"},
+                                                     {"value": retries,
+                                                      "id": "retries"},
+                                                     {"value": distance_threshold,
+                                                      "id": "distance_threshold"}
+                                                 ]
 
-                                         })
-        self.add_mission_to_queue(mission)
-        self.logger.info(f"Mission added to queue, navigating to x: {x}, y: {y}, theta: {orientation}"
-                         )
+                                             })
+            self.add_mission_to_queue(mission)
+            self.logger.info(f"Mission added to queue, navigating to x: {x}, y: {y}, theta: {orientation}"
+                             )
 
-        if is_blocking:
-            # initial sleep since rest api takes some time to change mission queue status
-            time.sleep(0.2)
-            while self.is_executing_mission():
+            if is_blocking:
+                # initial sleep since rest api takes some time to change mission queue status
                 time.sleep(0.2)
+                while self.is_executing_mission():
+                    time.sleep(0.2)
+        except Exception as e:
+            self.logger.warn(
+                "Error while moving to x,y,theta: {}".format(str(e)))
+            success = False
+        return success
 
     def add_position(self, name, x, y, orientation, map_id, type_id=0):
         # type_id = 0 -> "normal" position

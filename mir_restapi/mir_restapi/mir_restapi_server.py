@@ -6,7 +6,7 @@ from rclpy.node import Node
 
 import mir_restapi.mir_restapi_lib
 from std_srvs.srv import Trigger
-from mir_msgs.srv import ExecMission
+from mir_msgs.srv import ExecMission, MoveToXYTheta
 from rcl_interfaces.msg import SetParametersResult
 
 
@@ -111,6 +111,12 @@ class MirRestAPIServer(Node):
             self.get_settings_callback)
         self.get_logger().info("Listening on 'mir_100_get_settings'")
 
+        self.create_service(
+            MoveToXYTheta,
+            'mir_100_move_to_x_y_theta',
+            self.move_to_x_y_theta_callback)
+        self.get_logger().info("Listening on 'mir_100_move_to_x_y_theta'")
+
     def test_api_connection(self):
         if self.api_handle is None:
             return -1
@@ -126,6 +132,13 @@ class MirRestAPIServer(Node):
             i += 1
             time.sleep(1)
         return 1
+
+    def move_to_x_y_theta_callback(self, request, response):
+        self.get_logger().info('Moving to x, y, theta...')
+        self.api_handle.move_to_x_y_theta(
+            x=request.x, y=request.y, orientation=request.theta)
+        response.success = True
+        return response
 
     def reponse_api_handle_not_exists(self, response):
         response.success = False

@@ -134,6 +134,13 @@ class MirRestAPIServer(Node):
         return 1
 
     def move_to_x_y_theta_callback(self, request, response):
+
+        emerg_response = self.is_emergency_halt_callback(request, response)
+        if emerg_response.message == str(True):
+            response.message = "Can't execute mission, emergency halt"
+            self.get_logger().error(response.message)
+            response.success = False
+            return response
         self.get_logger().info('Moving to x, y, theta...')
         success_move, error_msg = self.api_handle.move_to_x_y_theta(
             x=request.x, y=request.y, orientation=request.theta)

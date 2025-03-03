@@ -4,16 +4,30 @@ FROM ros:humble-ros-base
 ENV DISPLAY=${DISPLAY}
 ENV XAUTHORITY=/tmp/.Xauthority
 
+ARG GZ_VERSION
+
+
 RUN apt-get update && apt-get install -y \
     curl \
     lsb-release gnupg git sudo
 RUN sudo curl https://packages.osrfoundation.org/gazebo.gpg --output /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
 RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
 
-RUN apt-get update 
-RUN apt-get install -y \
-    ignition-fortress \
-    && rm -rf /var/lib/apt/lists/*
+
+RUN echo "GZ_VERSION argument: $GZ_VERSION" && \
+    if [ "$GZ_VERSION" = "fortress" ]; then \
+        installCMD="ignition-fortress"; \
+    elif [ "$GZ_VERSION" = "harmonic" ]; then \
+        installCMD="gz-harmonic"; \
+    else \
+        echo "Invalid version"; \
+        exit 1; \
+    fi && \
+    echo "Selected version: $installCMD" && \
+    apt-get update && \
+    apt-get install -y \
+    ${installCMD} \
+    && rm -rf /installCMD/lib/apt/lists/*
 WORKDIR /ws
 RUN mkdir -p /ws/mir_robot
 RUN git clone https://github.com/UlPix/mir_robot.git

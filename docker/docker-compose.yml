@@ -1,15 +1,18 @@
 services:
-  ros2-humble:
-    build: .
-    container_name: ros2-humble-gazebo-fortress
+  ros2-gazebo:
+    build:
+      context: .
+      args:
+        GZ_VERSION: "harmonic"
+    container_name: ros2-humble-gazebo
     environment:
       - DISPLAY=${DISPLAY}
       - XAUTHORITY=/tmp/.Xauthority
-      - GZ_VERSION="fortress"
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - ~/mir_robot:/ws/mir_robot
-
+    devices:
+     - /dev/dri
     network_mode: "host"   
     stdin_open: true      
     tty: true             

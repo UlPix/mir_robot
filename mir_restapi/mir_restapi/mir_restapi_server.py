@@ -135,9 +135,10 @@ class MirRestAPIServer(Node):
 
     def move_to_x_y_theta_callback(self, request, response):
         self.get_logger().info('Moving to x, y, theta...')
-        success_move = self.api_handle.move_to_x_y_theta(
+        success_move, error_msg = self.api_handle.move_to_x_y_theta(
             x=request.x, y=request.y, orientation=request.theta)
         response.success = success_move
+        response.message = error_msg
         return response
 
     def reponse_api_handle_not_exists(self, response):

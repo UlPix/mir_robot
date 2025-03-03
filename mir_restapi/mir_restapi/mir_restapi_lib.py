@@ -291,6 +291,7 @@ class MirRestAPI():
         #    print(self.delete_mission_queue())
         # self.set_state_id(4)
         success = True
+        error_code = ""
         try:
 
             # set robot ready
@@ -333,8 +334,9 @@ class MirRestAPI():
         except Exception as e:
             self.logger.warn(
                 "Error while moving to x,y,theta: {}".format(str(e)))
+            error_code = str(e)
             success = False
-        return success
+        return success, error_code
 
     def add_position(self, name, x, y, orientation, map_id, type_id=0):
         # type_id = 0 -> "normal" position

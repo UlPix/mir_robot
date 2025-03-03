@@ -160,7 +160,7 @@
     <sensor name="front_laser_link" type="gpu_lidar">
       <visualize>false</visualize>
       <update_rate>12.5</update_rate>
-      <frame_id>front_laser_link</frame_id>
+      <gz_frame_id>front_laser_link</gz_frame_id>
       <topic>f_scan</topic>
       <lidar>
         <scan>
@@ -173,8 +173,8 @@
           </horizontal>
         </scan>
         <range>
-          <min>0.05</min>
-          <max>29.0</max>
+          <min>0.03</min>
+          <max>8.0</max>
           <resolution>0.01</resolution>
         </range>
         <noise>
@@ -230,7 +230,7 @@
     <sensor name="back_laser_link" type="gpu_lidar">
       <visualize>false</visualize>
       <update_rate>12.5</update_rate>
-      <frame_id>back_laser_link</frame_id>
+      <gz_frame_id>back_laser_link</gz_frame_id>
       <topic>b_scan</topic>
       <lidar>
         <scan>
@@ -243,8 +243,8 @@
           </horizontal>
         </scan>
         <range>
-          <min>0.05</min>
-          <max>29.0</max>
+          <min>0.03</min>
+          <max>8.0</max>
           <resolution>0.01</resolution>
         </range>
         <noise>

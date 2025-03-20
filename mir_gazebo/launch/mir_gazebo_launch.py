@@ -1,3 +1,5 @@
+from launch_ros.substitutions import FindPackageShare
+from launch_ros.actions import Node
 import os
 
 from ament_index_python.packages import get_package_share_directory
@@ -6,8 +8,9 @@ from launch.conditions import IfCondition
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, OpaqueFunction, \
     SetLaunchConfiguration, AppendEnvironmentVariable
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration
-from launch_ros.actions import Node
+from launch.substitutions import (LaunchConfiguration, Command,
+                                  FindExecutable, LaunchConfiguration, PathJoinSubstitution)
+from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
@@ -52,6 +55,12 @@ def generate_launch_description():
         'use_sim_time',
         default_value='true',
         description='Use simulation (Gazebo) clock if true')
+
+    declare_description_file = DeclareLaunchArgument(
+        "description_file",
+        default_value="mir.urdf.xacro",
+        description="URDF/XACRO description file with the robot.",
+    )
 
     declare_world_arg = DeclareLaunchArgument(
         'world',
@@ -110,6 +119,7 @@ def generate_launch_description():
     )
 
     def process_namespace(context):
+
         robot_name = "mir_robot"
         try:
             namespace = context.launch_configurations['namespace']
@@ -118,12 +128,23 @@ def generate_launch_description():
             pass
         return [SetLaunchConfiguration('robot_name', robot_name)]
 
+    xacro_command = Command([
+        PathJoinSubstitution([FindExecutable(name="xacro")]),
+        " ",
+        PathJoinSubstitution([
+            FindPackageShare("mir_description"),
+            "urdf",
+            LaunchConfiguration("description_file"),
+        ])
+    ])
+
+    set_urdf = SetLaunchConfiguration("robot_description", xacro_command)
     spawn_robot = Node(
         package='ros_gz_sim',
         executable='create',
         arguments=[
             '-name', "mir_robot",
-            '-file', mir_robot_xacro_path,
+            '-string', LaunchConfiguration("robot_description"),
             '-x', LaunchConfiguration('robot_x'),
             '-y', LaunchConfiguration('robot_y'),
             '-z', '0.01'
@@ -180,6 +201,8 @@ def generate_launch_description():
     ld.add_action(declare_namespace_arg)
     ld.add_action(declare_robot_x_arg)
     ld.add_action(declare_robot_y_arg)
+    ld.add_action(declare_description_file)
+    ld.add_action(set_urdf)
     ld.add_action(declare_robot_yaw_arg)
     ld.add_action(declare_sim_time_arg)
     ld.add_action(declare_world_arg)

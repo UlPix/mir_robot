@@ -3,7 +3,7 @@ services:
     build:
       context: .
       args:
-        GZ_VERSION: "harmonic"
+        GZ_VERSION: "fortress"
     container_name: ros2-humble-gazebo
     environment:
       - DISPLAY=${DISPLAY}
